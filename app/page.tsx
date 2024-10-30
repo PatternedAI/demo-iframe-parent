@@ -24,6 +24,7 @@ export default function Child() {
   useEffect(() => {
     // Function to fetch JWT
     console.log("PARENT_SITE_URL:", process.env.PARENT_SITE_URL);
+
     const url = `${process.env.PARENT_SITE_URL}/api/get-jwt`;
     console.log("Fetching URL:", url);
     const parentSiteUrl =
