@@ -23,17 +23,17 @@ export default function Child() {
 
   useEffect(() => {
     // Function to fetch JWT
-    console.log("PARENT_SITE_URL:", process.env.PARENT_SITE_URL);
+    console.log("PARENT_SITE_URL:", process.env.NEXT_PUBLIC_PARENT_SITE_URL);
 
-    const url = `${process.env.PARENT_SITE_URL}/api/get-jwt`;
+    const url = `${process.env.NEXT_PUBLIC_PARENT_SITE_URL}/api/get-jwt`;
     console.log("Fetching URL:", url);
     const parentSiteUrl =
-      process.env.PARENT_SITE_URL || "http://localhost:3000"; // Fallback URL
+      process.env.NEXT_PUBLIC_PARENT_SITE_URL || "http://localhost:3000"; // Fallback URL
     console.log({ parentSiteUrl });
     const getJwtToken = async () => {
       try {
         const response = await fetch(
-          `${process.env.PARENT_SITE_URL}/api/get-jwt`,
+          `${process.env.NEXT_PUBLIC_PARENT_SITE_URL}/api/get-jwt`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -74,7 +74,7 @@ export default function Child() {
 
       <iframe
         ref={iframeRef}
-        src={process.env.PARENT_SITE_URL}
+        src={process.env.NEXT_PUBLIC_PARENT_SITE_URL}
         className="w-full h-screen border-2 border-black"
         onLoad={handleIframeLoad} // Call onLoad event to handle iframe load
       />
