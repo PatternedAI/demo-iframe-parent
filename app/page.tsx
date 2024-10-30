@@ -54,7 +54,6 @@ export default function Child() {
       }
     };
 
-    // Fetch JWT token after mounting
     getJwtToken();
   }, []);
 
