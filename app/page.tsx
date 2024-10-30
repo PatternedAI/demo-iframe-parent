@@ -15,7 +15,7 @@ export default function Child() {
     if (iframeRef.current && accessToken) {
       iframeRef.current.contentWindow?.postMessage(
         { accessToken },
-        process.env.PARENT_SITE_URL!,
+        process.env.NEXT_PUBLIC_PARENT_SITE_URL!,
       );
       console.log("Access token sent to parent:", accessToken);
     }
@@ -27,8 +27,7 @@ export default function Child() {
 
     const url = `${process.env.NEXT_PUBLIC_PARENT_SITE_URL}/api/get-jwt`;
     console.log("Fetching URL:", url);
-    const parentSiteUrl =
-      process.env.NEXT_PUBLIC_PARENT_SITE_URL || "http://localhost:3000"; // Fallback URL
+    const parentSiteUrl = process.env.NEXT_PUBLIC_PARENT_SITE_URL; // Fallback URL
     console.log({ parentSiteUrl });
     const getJwtToken = async () => {
       try {
