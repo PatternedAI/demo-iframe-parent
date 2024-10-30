@@ -15,7 +15,7 @@ export default function Child() {
     if (iframeRef.current && accessToken) {
       iframeRef.current.contentWindow?.postMessage(
         { accessToken },
-        process.env.PARENT_SITE_URL || "http://localhost:3001",
+        process.env.PARENT_SITE_URL!,
       );
       console.log("Access token sent to parent:", accessToken);
     }
@@ -23,6 +23,12 @@ export default function Child() {
 
   useEffect(() => {
     // Function to fetch JWT
+    console.log("PARENT_SITE_URL:", process.env.PARENT_SITE_URL);
+    const url = `${process.env.PARENT_SITE_URL}/api/get-jwt`;
+    console.log("Fetching URL:", url);
+    const parentSiteUrl =
+      process.env.PARENT_SITE_URL || "http://localhost:3000"; // Fallback URL
+    console.log({ parentSiteUrl });
     const getJwtToken = async () => {
       try {
         const response = await fetch(
