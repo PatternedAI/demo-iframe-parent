@@ -67,7 +67,7 @@ export default function Child() {
 
       <iframe
         ref={iframeRef}
-        src={process.env.PARENT_SITE_URL || "http://localhost:3001"}
+        src={process.env.PARENT_SITE_URL}
         className="w-full h-screen border-2 border-black"
         onLoad={handleIframeLoad} // Call onLoad event to handle iframe load
       />
