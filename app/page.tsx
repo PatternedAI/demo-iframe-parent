@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function Child() {
   const [isMounted, setIsMounted] = useState(false);
@@ -8,40 +8,78 @@ export default function Child() {
   const [accessTokenError, setAccessTokenError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-  const sendAccessToken = () => {
-    if (iframeRef.current && accessToken) {
+  const sendAccessToken = useCallback((token: string | null) => {
+    if (iframeRef.current && token) {
       iframeRef.current.contentWindow?.postMessage(
-        { accessToken },
+        { message: "accessToken", token },
         process.env.NEXT_PUBLIC_PARENT_SITE_URL!,
       );
-      console.log("Access token sent to parent:", accessToken);
+      console.log("Access token sent to parent:", token);
     }
-  };
+  }, []);
 
   // Function to handle iframe load event
   const handleIframeLoad = () => {
     console.log("Iframe loaded");
-    sendAccessToken();
+    sendAccessToken(accessToken);
   };
 
+  const getAccessToken = useCallback(async () => {
+    const response = await fetch("/api/get-access-token");
+
+    const data = await response.json();
+
+    console.log({ data });
+
+    if (data.error) {
+      setAccessTokenError(data.error);
+      return;
+    }
+
+    if (data.accessToken) {
+      setAccessToken(data.accessToken);
+      sendAccessToken(data.accessToken);
+      setAccessTokenError(null);
+      return;
+    }
+  }, [sendAccessToken]);
+
   useEffect(() => {
-    const getAccessToken = async () => {
-      const response = await fetch("/api/get-access-token");
+    getAccessToken();
+  }, []);
 
-      const data = await response.json();
+  // Listener to any event from the iframe
+  useEffect(() => {
+    // Handler for messages from the child iframe
+    const handleChildMessage = (event: MessageEvent) => {
+      // Ensure the message is from the expected origin
+      if (event.origin === process.env.NEXT_PUBLIC_PARENT_SITE_URL) {
+        console.log("Message received from child:", event.data);
 
-      if (data.error) {
-        setAccessTokenError(data.error);
-        return;
-      }
+        // Check the message structure
+        if (
+          event.data &&
+          typeof event.data === "object" &&
+          event.data.message
+        ) {
+          const { message } = event.data;
 
-      if (data.accessToken) {
-        setAccessToken(data.accessToken);
-        return;
+          if (message === "tokenExpired") {
+            console.log("Token has expired, refreshing required.");
+            setAccessToken(null);
+            setAccessTokenError("Token has expired, refreshing required.");
+          } else {
+            console.log("Unknown message received:", message);
+          }
+        }
       }
     };
 
-    getAccessToken();
+    // Attach the message event listener
+    window.addEventListener("message", handleChildMessage);
+
+    // Clean up the event listener on component unmount
+    return () => window.removeEventListener("message", handleChildMessage);
   }, []);
 
   useEffect(() => {
@@ -56,19 +94,26 @@ export default function Child() {
         <h1>Parent</h1>
       </div>
 
+      <div>
+        <button
+          onClick={() => {
+            setTimeout(() => {
+              sendAccessToken(accessToken);
+            }, 6000);
+          }}
+        >
+          Send Access Token (test after 5s)
+        </button>
+
+        <button onClick={getAccessToken}>Request new access token</button>
+      </div>
+
       <iframe
         ref={iframeRef}
         src={process.env.NEXT_PUBLIC_PARENT_SITE_URL}
         className="w-full h-screen border-2 border-black"
         onLoad={handleIframeLoad}
       />
-
-      {/* Optional: Button to send a message to the parent */}
-      <button
-      // onClick={sendAccessToken}
-      >
-        Send Access Token
-      </button>
     </main>
   );
 }
