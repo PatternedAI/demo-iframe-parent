@@ -13,7 +13,7 @@ export default function Child() {
     if (iframeRef.current && token) {
       iframeRef.current.contentWindow?.postMessage(
         { message: "accessToken", token },
-        process.env.NEXT_PUBLIC_PARENT_SITE_URL!,
+        process.env.NEXT_PUBLIC_CHILD_SITE_URL!,
       );
       console.log("Access token sent to parent:", token);
     }
@@ -59,7 +59,7 @@ export default function Child() {
     // Handler for messages from the child iframe
     const handleChildMessage = (event: MessageEvent) => {
       // Ensure the message is from the expected origin
-      if (event.origin === process.env.NEXT_PUBLIC_PARENT_SITE_URL) {
+      if (event.origin === process.env.NEXT_PUBLIC_CHILD_SITE_URL) {
         console.log("Message received from child:", event.data);
 
         // Check the message structure
@@ -118,7 +118,7 @@ export default function Child() {
 
       <iframe
         ref={iframeRef}
-        src={process.env.NEXT_PUBLIC_PARENT_SITE_URL}
+        src={process.env.NEXT_PUBLIC_CHILD_SITE_URL}
         className="w-full h-screen border-2 border-black"
         onLoad={handleIframeLoad}
       />

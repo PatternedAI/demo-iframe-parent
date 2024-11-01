@@ -5,7 +5,7 @@ export async function GET() {
     const AUTH_SECRET = process.env.API_KEY_SECRET!;
 
     const accessTokenResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_PARENT_SITE_URL!}/api/get-jwt`,
+      `${process.env.NEXT_PUBLIC_CHILD_SITE_URL!}/api/get-jwt`,
       {
         method: "POST",
         body: JSON.stringify({ auth_secret: AUTH_SECRET }),
