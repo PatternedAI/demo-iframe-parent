@@ -122,7 +122,7 @@ export default function Child() {
         src={process.env.NEXT_PUBLIC_CHILD_SITE_URL}
         className="w-full h-screen border-2 border-black"
         onLoad={handleIframeLoad}
-        sandbox="allow-forms allow-top-navigation allow-same-origin allow-downloads allow-scripts allow-top-navigation-to-custom-protocols allow-top-navigation-by-user-activation"
+        sandbox="allow-same-origin allow-scripts"
       />
     </main>
   );
