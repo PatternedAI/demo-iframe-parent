@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function Child() {
   const [isMounted, setIsMounted] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null); // State to store the access token
-  const [accessTokenError, setAccessTokenError] = useState<string | null>(null);
+  const [, setAccessTokenError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const sendAccessToken = useCallback((token: string | null) => {
