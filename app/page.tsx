@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Child() {
   const [isMounted, setIsMounted] = useState(false);
@@ -20,8 +21,10 @@ export default function Child() {
 
   // Function to handle iframe load event
   const handleIframeLoad = () => {
-    console.log("Iframe loaded");
-    sendAccessToken(accessToken);
+    if (isMounted) {
+      console.log("Iframe loaded");
+      sendAccessToken(accessToken);
+    }
   };
 
   const getAccessToken = useCallback(async () => {
@@ -45,11 +48,14 @@ export default function Child() {
   }, [sendAccessToken]);
 
   useEffect(() => {
-    getAccessToken();
-  }, []);
-
+    if (isMounted) {
+      getAccessToken();
+    }
+  }, [isMounted]);
   // Listener to any event from the iframe
   useEffect(() => {
+    if (!isMounted) return;
+
     // Handler for messages from the child iframe
     const handleChildMessage = (event: MessageEvent) => {
       // Ensure the message is from the expected origin
@@ -80,7 +86,7 @@ export default function Child() {
 
     // Clean up the event listener on component unmount
     return () => window.removeEventListener("message", handleChildMessage);
-  }, []);
+  }, [isMounted]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -94,18 +100,20 @@ export default function Child() {
         <h1>Parent</h1>
       </div>
 
-      <div>
-        <button
+      <div className="flex w-full justify-center items-center space-x-2 my-2">
+        <Button onClick={getAccessToken} variant="default">
+          Request new access token
+        </Button>
+        <Button
+          variant="destructive"
           onClick={() => {
             setTimeout(() => {
               sendAccessToken(accessToken);
             }, 6000);
           }}
         >
-          Send Access Token (test after 5s)
-        </button>
-
-        <button onClick={getAccessToken}>Request new access token</button>
+          Send Access Token (invalid after 5s)
+        </Button>
       </div>
 
       <iframe
