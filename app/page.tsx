@@ -4,12 +4,9 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Child() {
   const [isMounted, setIsMounted] = useState(false);
-  const [accessToken, setAccessToken] = useState(null); // State to store the access token
+  const [accessToken, setAccessToken] = useState<string | null>(null); // State to store the access token
+  const [accessTokenError, setAccessTokenError] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const sendAccessToken = () => {
     if (iframeRef.current && accessToken) {
@@ -21,64 +18,57 @@ export default function Child() {
     }
   };
 
-  useEffect(() => {
-    // Function to fetch JWT
-    console.log("PARENT_SITE_URL:", process.env.NEXT_PUBLIC_PARENT_SITE_URL);
-
-    const url = `${process.env.NEXT_PUBLIC_PARENT_SITE_URL}/api/get-jwt`;
-    console.log("Fetching URL:", url);
-    const parentSiteUrl = process.env.NEXT_PUBLIC_PARENT_SITE_URL; // Fallback URL
-    console.log({ parentSiteUrl });
-    const getJwtToken = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_PARENT_SITE_URL}/api/get-jwt`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: "exampleUserId" }),
-          },
-        );
-
-        if (!response.ok) throw new Error("Failed to authenticate");
-
-        const data = await response.json();
-        const token = data.accessToken;
-
-        // Store the access token in state
-        setAccessToken(token);
-        console.log("Access token fetched:", token);
-      } catch (error) {
-        console.error("Error fetching JWT token:", error);
-      }
-    };
-
-    getJwtToken();
-  }, []);
-
   // Function to handle iframe load event
   const handleIframeLoad = () => {
     console.log("Iframe loaded");
-    sendAccessToken(); // Send access token when iframe is ready
+    sendAccessToken();
   };
+
+  useEffect(() => {
+    const getAccessToken = async () => {
+      const response = await fetch("/api/get-access-token");
+
+      const data = await response.json();
+
+      if (data.error) {
+        setAccessTokenError(data.error);
+        return;
+      }
+
+      if (data.accessToken) {
+        setAccessToken(data.accessToken);
+        return;
+      }
+    };
+
+    getAccessToken();
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (!isMounted) return null;
 
   return (
     <main className="max-w-7xl mx-auto py-10">
       <div className="flex items-center justify-center text-3xl font-bold">
-        <h1>Child</h1>
+        <h1>Parent</h1>
       </div>
 
       <iframe
         ref={iframeRef}
         src={process.env.NEXT_PUBLIC_PARENT_SITE_URL}
         className="w-full h-screen border-2 border-black"
-        onLoad={handleIframeLoad} // Call onLoad event to handle iframe load
+        onLoad={handleIframeLoad}
       />
 
       {/* Optional: Button to send a message to the parent */}
-      <button onClick={sendAccessToken}>Send Access Token</button>
+      <button
+      // onClick={sendAccessToken}
+      >
+        Send Access Token
+      </button>
     </main>
   );
 }
