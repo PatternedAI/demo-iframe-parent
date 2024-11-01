@@ -15,6 +15,7 @@ export default function Child() {
         { message: "accessToken", token },
         process.env.NEXT_PUBLIC_CHILD_SITE_URL!,
       );
+
       console.log("Access token sent to parent:", token);
     }
   }, []);
