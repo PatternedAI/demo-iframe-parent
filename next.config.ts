@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `frame-ancestors 'self' https://demo-iframe-ten.vercel.app`,
           },
+          {
+            key: "Content-Security-Policy",
+            value: `frame-ancestors 'self' https://demo-iframe-green.vercel.app`,
+          },
         ],
       },
     ];
