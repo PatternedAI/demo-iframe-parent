@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Head from "next/head";
 import { Button } from "@/components/ui/button";
 
 export default function Child() {
@@ -96,34 +97,44 @@ export default function Child() {
   if (!isMounted) return null;
 
   return (
-    <main className="max-w-7xl mx-auto py-10">
-      <div className="flex items-center justify-center text-3xl font-bold">
-        <h1>Parent</h1>
-      </div>
+    <>
+      <Head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content={`frame-ancestors 'self' ${process.env.NEXT_PUBLIC_CHILD_SITE_URL!}`}
+        />
+      </Head>
 
-      <div className="flex w-full justify-center items-center space-x-2 my-2">
-        <Button onClick={getAccessToken} variant="default">
-          Request new access token
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={() => {
-            setTimeout(() => {
-              sendAccessToken(accessToken);
-            }, 6000);
-          }}
-        >
-          Send Access Token (invalid after 5s)
-        </Button>
-      </div>
+      <main className="max-w-7xl mx-auto py-10">
+        <div className="flex items-center justify-center text-3xl font-bold">
+          <h1>Parent</h1>
+        </div>
 
-      <iframe
-        ref={iframeRef}
-        src={process.env.NEXT_PUBLIC_CHILD_SITE_URL}
-        className="w-full h-screen border-2 border-black"
-        onLoad={handleIframeLoad}
-        sandbox="allow-same-origin allow-scripts"
-      />
-    </main>
+        <div className="flex w-full justify-center items-center space-x-2 my-2">
+          <Button onClick={getAccessToken} variant="default">
+            Request new access token
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              setTimeout(() => {
+                sendAccessToken(accessToken);
+              }, 6000);
+            }}
+          >
+            Send Access Token (invalid after 5s)
+          </Button>
+        </div>
+
+        <iframe
+          ref={iframeRef}
+          src={process.env.NEXT_PUBLIC_CHILD_SITE_URL}
+          className="w-full h-screen border-2 border-black"
+          onLoad={handleIframeLoad}
+          sandbox="allow-scripts allow-same-origin allow-forms"
+          allow="camera; microphone; fullscreen; display-capture; autoplay"
+        />
+      </main>
+    </>
   );
 }
