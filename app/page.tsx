@@ -112,7 +112,7 @@ export default function Child() {
 
         <div className="flex w-full justify-center items-center space-x-2 my-2">
           <Button onClick={getAccessToken} variant="default">
-            Request new access token
+            Parent Request new access token from Vercel backend
           </Button>
           <Button
             variant="destructive"
@@ -122,7 +122,7 @@ export default function Child() {
               }, 6000);
             }}
           >
-            Send Access Token (invalid after 5s)
+            Test using invalid token - Parent send the same token to iFrame - iFrame uses it after 6 seconds 
           </Button>
         </div>
 
