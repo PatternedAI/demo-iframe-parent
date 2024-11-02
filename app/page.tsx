@@ -122,7 +122,8 @@ export default function Child() {
               }, 6000);
             }}
           >
-            Test using invalid token - Parent send the same token to iFrame - iFrame uses it after 6 seconds 
+            Test using invalid token - Parent send the same token to iFrame -
+            iFrame uses it after 6 seconds
           </Button>
         </div>
 
