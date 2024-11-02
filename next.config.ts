@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: `frame-ancestors 'self' ${process.env.NEXT_PUBLIC_CHILD_SITE_URL}`,
+            value: `frame-ancestors 'self' https://demo-iframe-ten.vercel.app`,
           },
         ],
       },
