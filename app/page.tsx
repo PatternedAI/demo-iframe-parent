@@ -128,7 +128,7 @@ export default function Child() {
 
         <iframe
           ref={iframeRef}
-          src={`process.env.NEXT_PUBLIC_CHILD_SITE_URL?x-vercel-protection-bypass=${process.env.NEXT_PUBLIC_X_Vercel_Protection_Bypass}`}
+          src={`${process.env.NEXT_PUBLIC_CHILD_SITE_URL}?x-vercel-protection-bypass=${process.env.NEXT_PUBLIC_X_Vercel_Protection_Bypass}`}
           className="w-full h-screen border-2 border-black"
           onLoad={handleIframeLoad}
           sandbox="allow-scripts allow-same-origin allow-forms"
