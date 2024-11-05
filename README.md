@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# iFrame Parent Repository
+This repository contains code for an iFrame parent application built with Next.js. It securely communicates with a backend to fetch an access token, which it sends to an embedded iFrame. The iFrame then uses this token for authentication.
+
+## Features
+- Fetches an access token from a backend server using an API.
+- Embeds an iFrame and sends the access token securely.
+- Listens for messages from the iFrame to handle token expiration and other events.
 
 ## Getting Started
+### Prerequisites
+To run this application, ensure you have:
+- Node.js and npm installed.
+- A .env file set up with the required environment variables (details below).
 
-First, run the development server:
-
+### Installation
+1- Clone this repository:
+```git
+git clone https://github.com/PatternedAI/demo-iframe-parent.git
+```
+2- Navigate to the project directory:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd demo-iframe-parent
+```
+3- Install dependencies:
+```npm
+npm install
+```
+4- Set up environment variables by creating a .env file with the following:
+```env
+NEXT_PUBLIC_CHILD_SITE_URL=https://demo-iframe-ten.vercel.app # or any link for the iframe repo
+API_KEY_SECRET="hello-world"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Run the Application
+```npm
+npm run dev
+```
+2- Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Code Overview
+#### API Route - Access Token Retrieval
+The GET API route at /api/get-access-token connects to the backend and fetches an access token.
+```ts
+import { NextResponse } from "next/server";
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+export async function GET() {
+  try {
+    const AUTH_SECRET = process.env.API_KEY_SECRET!;
 
-## Learn More
+    const accessTokenResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_CHILD_SITE_URL!}/api/get-jwt`,
+      {
+        method: "POST",
+        body: JSON.stringify({ auth_secret: AUTH_SECRET }),
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
-To learn more about Next.js, take a look at the following resources:
+    const accessTokenData = await accessTokenResponse.json();
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    if (accessTokenData.error) {
+      return NextResponse.json(
+        { error: accessTokenData.error },
+        { status: accessTokenData.status },
+      );
+    }
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    return NextResponse.json(
+      { accessToken: accessTokenData.accessToken },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { error: "Internal server error!" },
+      { status: 500 },
+    );
+  }
+}
+```
 
-## Deploy on Vercel
+Page - Displaying the iFrame and Sending the Token
+The page is responsible for:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Fetching the access token when the component mounts.
+- Embedding an iFrame and sending the token to it once available.
+- Handling messages from the iFrame for token expiration.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Configuration
+```ts
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: `frame-ancestors 'self' ${process.env.NEXT_PUBLIC_CHILD_SITE_URL}`,
+          },
+        ],
+      },
+    ];
+  },
+};
+export default nextConfig;
+```
+
+#### Additional Notes
+- Token Expiration Handling: If the token expires, the child iFrame will send a tokenExpired message to the parent, triggering a token refresh.
+- Debugging: Console logs in both the parent and iFrame will display token activity for easier debugging.
