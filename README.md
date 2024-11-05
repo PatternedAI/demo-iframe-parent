@@ -27,7 +27,7 @@ npm install
 ```
 4- Set up environment variables by creating a .env file with the following:
 ```env
-NEXT_PUBLIC_CHILD_SITE_URL=https://demo-iframe-ten.vercel.app # or any link for the iframe repo
+NEXT_PUBLIC_CHILD_SITE_URL=https://demo-iframe-ten.vercel.app # or any link for the iframe repo (http://localhost:3001)
 API_KEY_SECRET="hello-world"
 ```
 
