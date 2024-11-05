@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
 
-export default function Child() {
+export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null); // State to store the access token
   const [, setAccessTokenError] = useState<string | null>(null);
